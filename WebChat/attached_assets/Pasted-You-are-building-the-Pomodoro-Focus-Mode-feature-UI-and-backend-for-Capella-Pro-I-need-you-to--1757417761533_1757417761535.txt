@@ -1,0 +1,105 @@
+You are building the Pomodoro (Focus Mode) feature UI and backend for Capella Pro. 
+I need you to **apply the following exact changes** to the design and functionality:
+
+---
+
+### Top Bar
+- Remove the "brain" logo and the "profile" button completely.
+- Keep a clean top bar with the feature title "Focus Mode".
+- Add a functional **Settings button (⚙️)** in the right corner that opens the Pomodoro settings modal.
+- Settings modal should control: Pomodoro/Break durations, Auto-start toggle, Notifications (sound/desktop), and Email weekly summary.
+
+---
+
+### Card Styling
+- All cards/boxes should use a **light gray background** (`capella-card` #F7F8FA) instead of white.
+- Add soft glassmorphic effect (blur, subtle shadow, rounded corners).
+- Consistent style across all boxes.
+
+---
+
+### Block 1 Layout
+- Block 1 must contain **two boxes** side by side:
+  1. **Box 1 (left side)**  
+     - Analog Clock (premium design, with all 3 hands, glassmorphic).  
+     - Below the analog clock: **Digital Time** (large text, black).  
+     - Below digital time: **Greeting** ("Good Morning/Afternoon/Evening").  
+     - On the **right side of this same box**, add a **Mini Calendar** with Apple-style glass effect.  
+       - Today’s date highlighted in **red glassmorphic circle**.  
+       - Ensure calendar text is not blurry and stays readable.
+  2. **Box 2 (right side)**  
+     - Pomodoro Progress Circle (countdown inside).  
+     - Below the circle: controls in **one card** → Start/Pause (single toggle button, teal bg, black text), Reset, Skip.  
+     - Show keyboard shortcuts below controls (Space = Start/Pause, R = Reset, S = Skip).
+
+---
+
+### Block 2 Layout (Below)
+- Block 2 should display **User Statistics + Graph + Reports**.
+- **Today’s Focus Stats**: show Focus Time Today, Pomodoros Completed, Streak, Avg Session.  
+  - Use **dark teal** for numbers (not light teal).
+- **Graph**:
+  - Fix overlapping labels → ensure spacing is correct.  
+  - Make the graph more premium by adding:  
+    - Average session length.  
+    - Peak focus hours (highlight).  
+    - Weekly trend line (use **dark teal** for lines).  
+  - Glassmorphic background, clean axis labels.
+- **Reports Card**:
+  - Buttons: Export CSV, Export PDF.  
+  - Toggle: Email Weekly Summary.  
+  - Style to match other cards.
+
+---
+
+### Functionality
+- Ensure **Pomodoro timer works fully**: Start, Pause, Reset, Skip all update state properly.
+- Analog clock must display **real system time with smooth hands**.
+- Greeting updates dynamically based on time of day.
+- Calendar should switch months (with next/prev arrows).
+- Graph pulls data from sessions API and updates automatically after each Pomodoro.
+- Stats panel updates live with current session data.
+- Reports buttons generate mock CSV/PDF for now.
+- All settings in the modal should persist to localStorage and affect the timer immediately.
+- Notifications: show toast + play sound when session ends. If "desktop notifications" is enabled, show native notification too.
+
+---
+
+### File Structure (arrange exactly like this for Capella Pro integration)
+- `apps/web/features/focus-mode/pages/index.tsx`
+- `apps/web/features/focus-mode/components/TopBar.tsx`
+- `apps/web/features/focus-mode/components/AnalogClock.tsx`
+- `apps/web/features/focus-mode/components/DigitalTimeGreeting.tsx`
+- `apps/web/features/focus-mode/components/MiniCalendar.tsx`
+- `apps/web/features/focus-mode/components/ProgressRing.tsx`
+- `apps/web/features/focus-mode/components/Controls.tsx`
+- `apps/web/features/focus-mode/components/StatsPanel.tsx`
+- `apps/web/features/focus-mode/components/GraphCard.tsx`
+- `apps/web/features/focus-mode/components/ReportsCard.tsx`
+- `apps/web/features/focus-mode/hooks/usePomodoro.ts`
+- `apps/web/features/focus-mode/lib/focusServiceClient.ts`
+- `apps/web/features/focus-mode/styles/focus-mode.css`
+
+API Routes (Next.js):
+- `apps/web/pages/api/focus/start.ts`
+- `apps/web/pages/api/focus/end.ts`
+- `apps/web/pages/api/focus/stats.ts`
+- `apps/web/pages/api/focus/export.ts`
+
+---
+
+### Style Tokens
+Extend `tailwind.config.js` with:
+```js
+theme: {
+  extend: {
+    colors: {
+      'capella-bg': '#ffffff',
+      'capella-text': '#000000',
+      'capella-btn': '#9FE8DF',  // light teal
+      'capella-btn-text': '#000000',
+      'capella-card': '#F7F8FA', // light gray
+      'capella-dark-teal': '#008B8B' // dark teal for graph/stats
+    }
+  }
+}

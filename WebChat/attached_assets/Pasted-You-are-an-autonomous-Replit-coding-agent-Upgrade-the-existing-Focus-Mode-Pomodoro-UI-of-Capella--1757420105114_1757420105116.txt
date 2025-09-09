@@ -1,0 +1,122 @@
+You are an autonomous Replit coding agent. Upgrade the existing Focus Mode (Pomodoro) UI of Capella Pro with the following exact changes. Arrange files exactly as requested and make sure the feature works without errors.
+
+---
+
+### 1. Responsiveness & Layout
+- Ensure the app is fully responsive. When Capella Pro is opened on any device (desktop, laptop, tablet, mobile), the layout should automatically adjust resolution and fill the screen width without leaving empty space on the left or right.
+- Each block/card should expand to fit the available screen space proportionally.
+- Maintain a clean, professional grid layout.
+
+---
+
+### 2. Block 1 – Left Box (Clock + Calendar + Music)
+**Clock Enhancements**
+- Make the analog clock more premium:
+  - Use smooth, continuous movement for the second hand (no tick-tick jump).
+  - Add hour markers as clean lines around the clock face.
+  - Use subtle shadows and glassmorphic style for premium look.
+- Below the analog clock:
+  - Show the **digital time** in bold (e.g., 5:37 PM).
+  - Show a short **time-based greeting** (Good Morning, Good Afternoon, Good Evening) + user name.
+  - Remove the extra text (“Ready to focus?”).
+
+**Calendar Enhancements**
+- High-quality **glassmorphic Apple-style design**.
+- Today’s date should be highlighted with a **premium red-glass circle**.
+- Fix text so it is sharp, not blurry.
+- Keep navigation arrows (next/prev month) working.
+
+**Music Player**
+- Add a simple **premium relaxation music player** inside this box, below the clock and calendar (where space is available).
+- Controls: Play/Pause, Next, Previous, Volume slider.
+- Use a small set of bundled relaxing tracks (can be mock MP3 links).
+- Styled with glass effect to blend in with the box.
+
+---
+
+### 3. Block 1 – Right Box (Pomodoro)
+- Make sure the **Pomodoro timer is fully functional**:
+  - Start, Pause, Reset, and Skip must all work correctly.
+  - Progress ring animates smoothly.
+  - When the session completes, automatically switch to the next mode (Pomodoro → Short Break → Long Break).
+  - Keyboard shortcuts (Space = Start/Pause, R = Reset, S = Skip).
+- Style improvements:
+  - Use **light grey card background** (`capella-card`) instead of white.
+  - Buttons: light teal background with black text.
+  - Add subtle glow to active button.
+
+---
+
+### 4. Block 2 – Stats, Graph, Reports
+**Today’s Focus Stats**
+- Numbers (Focus Time, Pomodoros, Streak, Avg Session) should use **dark teal** color for contrast.
+
+**Graph**
+- Fix overlapping day names. Ensure all axis labels are spaced correctly.
+- Improve typography of graph labels (professional, modern font).
+- Add more info in graph card:
+  - Weekly total hours.
+  - Average session length.
+  - Peak focus hours/day.
+- Use a **dark teal line** or bars for clarity, not light teal.
+- Glassmorphic card background.
+
+**Reports & Export**
+- Keep Export CSV and Export PDF working.
+- Weekly summary toggle must persist to localStorage and display enabled/disabled status correctly.
+- Match styling of other boxes.
+
+---
+
+### 5. Global Style & Polish
+- Change all card backgrounds from white → **light grey (`#F7F8FA`)** with glassmorphic effect (blur, shadow, rounded).
+- Ensure **all text is black** with strong readability.
+- Use **Capella Pro theme colors** consistently:
+  - Background: white
+  - Text: black
+  - Buttons: light teal (#9FE8DF)
+  - Button text: black
+  - Stats/graph highlights: dark teal (#008B8B)
+- Apply polish to spacing, alignment, and typography so the UI feels premium and enterprise-ready.
+
+---
+
+### 6. File Structure (must follow Capella Pro monorepo)
+Frontend:
+- `apps/web/features/focus-mode/pages/index.tsx`
+- `apps/web/features/focus-mode/components/TopBar.tsx`
+- `apps/web/features/focus-mode/components/AnalogClock.tsx`
+- `apps/web/features/focus-mode/components/DigitalTimeGreeting.tsx`
+- `apps/web/features/focus-mode/components/MiniCalendar.tsx`
+- `apps/web/features/focus-mode/components/MusicPlayer.tsx`
+- `apps/web/features/focus-mode/components/ProgressRing.tsx`
+- `apps/web/features/focus-mode/components/Controls.tsx`
+- `apps/web/features/focus-mode/components/StatsPanel.tsx`
+- `apps/web/features/focus-mode/components/GraphCard.tsx`
+- `apps/web/features/focus-mode/components/ReportsCard.tsx`
+- `apps/web/features/focus-mode/hooks/usePomodoro.ts`
+- `apps/web/features/focus-mode/lib/focusServiceClient.ts`
+- `apps/web/features/focus-mode/styles/focus-mode.css`
+
+Backend API routes (Next.js):
+- `apps/web/pages/api/focus/start.ts`
+- `apps/web/pages/api/focus/end.ts`
+- `apps/web/pages/api/focus/stats.ts`
+- `apps/web/pages/api/focus/export.ts`
+
+---
+
+### 7. Tailwind Config (extend theme)
+```js
+theme: {
+  extend: {
+    colors: {
+      'capella-bg': '#ffffff',
+      'capella-text': '#000000',
+      'capella-btn': '#9FE8DF',
+      'capella-btn-text': '#000000',
+      'capella-card': '#F7F8FA',
+      'capella-dark-teal': '#008B8B'
+    }
+  }
+}

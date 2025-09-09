@@ -1,0 +1,174 @@
+You are an autonomous Replit coding agent. Your job is to create a complete, well-structured, dev-ready **Pomodoro (Focus Mode)** feature prototype for Capella Pro. Use **Next.js (TypeScript)** + **Tailwind CSS** for the frontend and **Next API routes** (or a lightweight Express server inside `packages/server` if you prefer) for the backend mocks. Arrange files and exports exactly so they can be copy/pasted into the Capella Pro monorepo with minimal changes.
+
+**Important constraints & style**
+- Project uses TypeScript. All files must be TS/TSX.
+- Follow Capella Pro monorepo paths and conventions:
+  - Frontend files go under `apps/web/features/focus-mode/`
+  - API routes (if using Next API) go under `apps/web/pages/api/focus/`
+  - If you create server-side service stubs, put them under `packages/server/controllers/` and `packages/server/services/` with the same filenames and exports so they can be moved easily.
+  - Shared utils (types) should import from `packages/shared` where appropriate; if unavailable in Replit, create `packages/shared` stubs with the same exports (types, interfaces).
+- Default UI theme tokens must match Capella Pro memory:
+  - Background: **white**
+  - Text & Logo: **black**
+  - Button background: **light teal**
+  - Button text: **black**
+- Use Tailwind utility classes; include a `tailwind.config.js` extension snippet that adds Capella tokens: `capella-bg`, `capella-text`, `capella-btn`, `capella-btn-text`.
+- All components must be default exports (so moving them into the monorepo routes is trivial).
+- Keep imports relative inside `apps/web/features/focus-mode/` to avoid path resolution errors on copy.
+- Add a `README.md` explaining exactly where to place the files when moving to the Capella Pro repo and how to swap mocks to real Firebase.
+
+---
+
+## Tasks (do them in order, commit each step)
+
+### 1) Project scaffold (if starting fresh)
+- Init a Next.js TypeScript app (if not already present).
+- Install: `tailwindcss`, `postcss`, `autoprefixer`, `@tailwindcss/forms`, `firebase`, `firebase-admin`, `swr`, `axios`, `clsx`.
+- Setup Tailwind with standard config + extend theme with Capella tokens (example tokens below).
+- Create `.eslintrc` and `prettier` configs matching Capella style (strict, no errors).
+
+### 2) Create the frontend feature folder and files
+Create these files exactly at these paths **(use these exact filenames and folders)**:
+
+apps/web/features/focus-mode/pages/index.tsx
+apps/web/features/focus-mode/components/TopBar.tsx
+apps/web/features/focus-mode/components/AnalogClock.tsx
+apps/web/features/focus-mode/components/DigitalTimeGreeting.tsx
+apps/web/features/focus-mode/components/MiniCalendar.tsx
+apps/web/features/focus-mode/components/ProgressRing.tsx
+apps/web/features/focus-mode/components/Controls.tsx
+apps/web/features/focus-mode/components/StatsPanel.tsx
+apps/web/features/focus-mode/components/GraphCard.tsx
+apps/web/features/focus-mode/components/ReportsCard.tsx
+apps/web/features/focus-mode/hooks/usePomodoro.ts
+apps/web/features/focus-mode/lib/focusServiceClient.ts
+apps/web/features/focus-mode/styles/focus-mode.css
+apps/web/features/focus-mode/README.md
+
+markdown
+Copy code
+
+**File responsibilities (brief)**
+- `index.tsx` — page wrapper: imports `TopBar`, two-column layout (Block 1 left: `AnalogClock`, `DigitalTimeGreeting`, `MiniCalendar`; Block 1 right: `ProgressRing` + `Controls`), Block 2: `StatsPanel`, `GraphCard`, `ReportsCard`.
+- `TopBar.tsx` — top bar component (use the final design we agreed).
+- `AnalogClock.tsx` — premium analog clock with 3 hands and glassmorphic styling (SVG-based).
+- `DigitalTimeGreeting.tsx` — shows digital HH:MM and greeting based on local time.
+- `MiniCalendar.tsx` — small month view; highlight today using **red glass** effect; ensure keyboard accessible.
+- `ProgressRing.tsx` — circular timer with stroke-dashoffset animation and glassmorphic center.
+- `Controls.tsx` — Start/Pause toggle (single main button), Reset, Skip small buttons; show keyboard shortcut hints.
+- `StatsPanel.tsx` — shows Focus Time Today, Pomodoros Completed, Current Streak, Average Session.
+- `GraphCard.tsx` — weekly focus chart (use `svg` + simple drawing or Chart.js; prefer plain SVG so no extra deps).
+- `ReportsCard.tsx` — Export CSV, Export PDF buttons; show "Email Weekly Summary" toggle status.
+- `usePomodoro.ts` — full timer state machine: start/pause/reset/skip, local persistence (localStorage), offline sync flags, emits events to `focusServiceClient`.
+- `focusServiceClient.ts` — thin API client that calls the API endpoints (abstracts mock vs real Firestore).
+- `focus-mode.css` — any extra CSS (glassmorphism, shadows). Keep Tailwind primary.
+
+### 3) Create backend API routes (Next API routes)
+Create these files so that later they are easy to move into `packages/server` if desired:
+
+apps/web/pages/api/focus/start.ts
+apps/web/pages/api/focus/end.ts
+apps/web/pages/api/focus/stats.ts
+apps/web/pages/api/focus/export.ts
+
+bash
+Copy code
+
+**API behavior**
+- `POST /api/focus/start` — accept `{ userId, mode, durationRequested, startedAt }`, returns `{sessionId}`. When Firebase envs not configured, store session in an in-memory store and return id. Log a clear comment in file where to switch to firebase-admin.
+- `POST /api/focus/end` — accept `{ sessionId, endedAt, durationActual, completed }`, update session. Return updated session.
+- `GET /api/focus/stats?range=today|week` — compute stats from stored sessions and return `{todayMinutes, cycles, streak, avgSession, lastSessions[]}`.
+- `POST /api/focus/export` — generate CSV on-the-fly and return as file download or base64 content.
+
+**Important**: Each API must check for a `USE_FIREBASE` env variable: if `true`, initialize `firebase-admin` with credentials from `FIREBASE_SERVICE_ACCOUNT` (or emulator) and write to `focus_sessions` collection. If `false` or missing, use the in-memory fallback but structure data identically.
+
+### 4) Tailwind theme tokens & config snippet
+Add `tailwind.config.js` extension (under `apps/web/`) with tokens:
+
+```js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        'capella-bg': '#ffffff',
+        'capella-text': '#000000',
+        'capella-btn': '#9FE8DF', // light teal
+        'capella-btn-text': '#000000',
+        'capella-card': '#F7F8FA' // slight gray cards
+      }
+    }
+  }
+}
+Mention this exact snippet in apps/web/features/focus-mode/README.md so the maintainer copies it into the monorepo root tailwind.config.js if needed.
+
+5) Local dev scripts & lint
+Add an npm script to run the app in Replit: dev that runs Next.js.
+
+Run ESLint and Prettier automatically; create .vscode settings snippet for dev to use recommended settings.
+
+6) README & Integration Notes (VERY IMPORTANT)
+Create apps/web/features/focus-mode/README.md with:
+
+Exact list of files & paths created (copy this prompt's list).
+
+Exact env variables required:
+
+NEXT_PUBLIC_FIREBASE_API_KEY, NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN, NEXT_PUBLIC_FIREBASE_PROJECT_ID, FIREBASE_SERVICE_ACCOUNT (JSON string), and USE_FIREBASE (true/false).
+
+How to switch from in-memory mock to Firestore (detailed steps: set USE_FIREBASE=true, put service account JSON into FIREBASE_SERVICE_ACCOUNT, and remove in-memory import lines).
+
+How to copy files into Capella Pro monorepo:
+
+Copy apps/web/features/focus-mode/ into monorepo's apps/web/features/.
+
+Copy API routes to apps/web/pages/api/focus/ or move controllers to packages/server/controllers/focusController.ts and services to packages/server/services/focusService.ts — maintain the exact exported function names.
+
+Add the Tailwind tokens to root tailwind.config.js (snippet included).
+
+Ensure packages/shared has the types used (copy packages/shared/types/focus.d.ts stub if necessary).
+
+A checklist the agent must produce at completion showing: all files created, lint pass, dev server started (or instructions to start), and a successful "manual run test plan" that the reviewer can follow.
+
+7) Developer-friendly extras (reduce errors on copy)
+Use only relative imports within apps/web/features/focus-mode/* (e.g., ./components/Controls), never absolute imports that depend on monorepo root mapping.
+
+Do not reference monorepo-only helpers that may not exist. If a helper is needed, create a small local shim in apps/web/features/focus-mode/lib/ and add a TODO comment to replace it with packages/shared after copying.
+
+Each component file must export export default ComponentName; at the end so replacing is trivial.
+
+Add clear comments at top of each API route with a single line: // COPY NOTE: When moving into capellapro monorepo, move to packages/server/controllers or keep here under apps/web/pages/api/focus/ — this will prevent confusion later.
+
+Add types under apps/web/features/focus-mode/types.d.ts replicating FocusSession type so copy/paste doesn't fail.
+
+Add a small integration test script (scripts/smoke-focus-mode.sh) that pings GET /api/focus/stats and POST /api/focus/start to demonstrate endpoints.
+
+8) Deliverable & final checks
+When finished, produce:
+
+A compressed folder (zip) of apps/web/features/focus-mode/ and apps/web/pages/api/focus/ (if Replit supports generating archives).
+
+A checklist indicating:
+
+ All files created (list).
+
+ TypeScript compiled with tsc --noEmit (no type errors).
+
+ ESLint run: no errors (fixable warnings OK).
+
+ Dev server runs and displays /focus-mode page (or instructions if Replit cannot run).
+
+ Smoke test run: POST /api/focus/start -> GET /api/focus/stats -> POST /api/focus/end works using mock store.
+
+README.md with exact copy-to-monorepo instructions and where to change envs.
+
+Quick dev notes for the agent (tone: exact)
+Prioritize stability & portable architecture over bells and whistles. The UI should match the blueprint but can use SVG placeholders for confetti/advanced animation.
+
+Keep all external dependencies minimal. If a chart library is used, prefer a single lightweight dependency (or plain SVG).
+
+Put clear TODO comments where Firestore code needs to plug in (service account usage).
+
+Use console.debug logs in API routes to help users diagnose quickly.
+
+Use localStorage keys prefixed with capella_focus_ to avoid collisions.
+
